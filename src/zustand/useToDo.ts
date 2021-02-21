@@ -15,15 +15,19 @@ export interface ToDoState extends State {
   addColumn: (title: string) => void
 }
 
+const initialState = {
+  tasks: initialData.tasks,
+  columns: initialData.columns,
+  columnOrder: initialData.columnOrder,
+  taskCount: Object.keys(initialData.tasks).length,
+  columnCount: Object.keys(initialData.columns).length,
+}
+
 const useToDo = create<ToDoState>(
   devtools(
     persist(
       (set, get) => ({
-        tasks: initialData.tasks,
-        columns: initialData.columns,
-        columnOrder: initialData.columnOrder,
-        taskCount: Object.keys(initialData.tasks).length,
-        columnCount: Object.keys(initialData.columns).length,
+        ...initialState,
 
         reorderItems: (result: any) => {
           const { destination, source, draggableId } = result
@@ -52,15 +56,13 @@ const useToDo = create<ToDoState>(
             taskIds: newDestinationTasks,
           }
 
-          set(
-            produce((state) => {
-              state.columns = {
-                ...state.columns,
-                [newSourceColumn.id]: newSourceColumn,
-                [newDestinationColumn.id]: newDestinationColumn,
-              }
-            })
-          )
+          set((state) => ({
+            columns: {
+              ...state.columns,
+              [newSourceColumn.id]: newSourceColumn,
+              [newDestinationColumn.id]: newDestinationColumn,
+            },
+          }))
         },
 
         reorderColumns: (result: any) => {
@@ -83,11 +85,9 @@ const useToDo = create<ToDoState>(
           newColumnOrder.splice(destination.index, 0, draggableId)
           console.log({ newColumnOrder })
 
-          set(
-            produce((state) => {
-              state.columnOrder = newColumnOrder
-            })
-          )
+          set({
+            columnOrder: newColumnOrder,
+          })
         },
 
         addItem: (column: string, content: string) => {
