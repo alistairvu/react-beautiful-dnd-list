@@ -1,20 +1,22 @@
 import { Column } from "./components"
 import { DragDropContext, Droppable } from "react-beautiful-dnd"
-import { useDispatch, useSelector } from "react-redux"
-import { rootState } from "./redux"
-import { reorderItems, reorderColumns, addColumn } from "./redux/toDoSlice"
 import { useState, useRef, useEffect } from "react"
-import { Button, Form, Row } from "react-bootstrap"
+import { Button, Form } from "react-bootstrap"
+import useToDo from "./zustand/useToDo"
 
 const App = () => {
   const [adding, setAdding] = useState(false)
   const [newColumn, setNewColumn] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const dispatch = useDispatch()
-  const { columnOrder, columns, tasks: taskList } = useSelector(
-    (state: rootState) => state.toDo
-  )
+  const {
+    columnOrder,
+    columns,
+    tasks: taskList,
+    addColumn,
+    reorderItems,
+    reorderColumns,
+  } = useToDo()
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -23,7 +25,7 @@ const App = () => {
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (newColumn.trim()) {
-      dispatch(addColumn(newColumn))
+      addColumn(newColumn)
       setNewColumn("")
     }
   }
@@ -65,12 +67,13 @@ const App = () => {
 
   const onDragEnd = (result: any) => {
     switch (result.type) {
-      case "TASKS": {
-        dispatch(reorderItems(result))
+      case "TASK": {
+        reorderItems(result)
         break
       }
-      case "COLUMNS": {
-        dispatch(reorderColumns(result))
+      case "COLUMN": {
+        console.log("changing columns")
+        reorderColumns(result)
         break
       }
     }
@@ -88,25 +91,19 @@ const App = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="row">
-        <Droppable
-          droppableId="all-columns"
-          direction="horizontal"
-          type="COLUMNS"
-        >
-          {(provided) => (
-            <div
-              className="m-2 d-flex justify-content-start"
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-            >
-              {renderColumns()}
-              {renderAddForm()}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </div>
+      <Droppable droppableId="all-columns" direction="horizontal" type="COLUMN">
+        {(provided) => (
+          <div
+            className="m-2 d-flex"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {renderColumns()}
+            {renderAddForm()}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     </DragDropContext>
   )
 }

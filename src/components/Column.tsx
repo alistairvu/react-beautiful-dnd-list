@@ -3,9 +3,7 @@ import { Draggable, Droppable } from "react-beautiful-dnd"
 import { Task } from "./Task"
 import { Button, Form } from "react-bootstrap"
 import { useState, useRef, useEffect } from "react"
-import { addItem } from "../redux/toDoSlice"
-import { useDispatch } from "react-redux"
-
+import useToDo, { ToDoState } from "../zustand/useToDo"
 interface ColumnProps {
   column: ColumnInterface
   tasks: TaskInterface[]
@@ -15,7 +13,7 @@ interface ColumnProps {
 export const Column = ({ column, tasks, index }: ColumnProps) => {
   const [adding, setAdding] = useState(false)
   const [newToDo, setNewToDo] = useState("")
-  const dispatch = useDispatch()
+  const addItem = useToDo((state: ToDoState) => state.addItem)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -25,7 +23,7 @@ export const Column = ({ column, tasks, index }: ColumnProps) => {
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (newToDo.trim()) {
-      dispatch(addItem(column.id, newToDo))
+      addItem(column.id, newToDo)
       setNewToDo("")
     }
   }
@@ -68,12 +66,11 @@ export const Column = ({ column, tasks, index }: ColumnProps) => {
           {...provided.draggableProps}
           ref={provided.innerRef}
           className="p-2 "
-          style={{ width: 300 }}
         >
           <div {...provided.dragHandleProps}>
             <Title>{column.title}</Title>
           </div>
-          <Droppable droppableId={column.id} type="TASKS">
+          <Droppable droppableId={column.id} type="TASK">
             {(provided, snapshot) => (
               <TaskList
                 ref={provided.innerRef}
@@ -99,6 +96,7 @@ const Container = styled.div`
   border: 1px solid lightgray;
   border-radius: 2px;
   margin: 8px;
+  width: 300px;
 `
 
 const Title = styled.h3`
