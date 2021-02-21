@@ -2,21 +2,19 @@ import { Column } from "./components"
 import { DragDropContext, Droppable } from "react-beautiful-dnd"
 import { useState, useRef, useEffect } from "react"
 import { Button, Form } from "react-bootstrap"
-import useToDo from "./zustand/useToDo"
+import useToDo, { ToDoState } from "./zustand/useToDo"
 
 const App = () => {
   const [adding, setAdding] = useState(false)
   const [newColumn, setNewColumn] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const {
-    columnOrder,
-    columns,
-    tasks: taskList,
-    addColumn,
-    reorderItems,
-    reorderColumns,
-  } = useToDo()
+  const columnOrder = useToDo((state: ToDoState) => state.columnOrder)
+  const columns = useToDo((state: ToDoState) => state.columns)
+  const taskList = useToDo((state: ToDoState) => state.tasks)
+  const addColumn = useToDo((state: ToDoState) => state.addColumn)
+  const reorderItems = useToDo((state: ToDoState) => state.reorderItems)
+  const reorderColumns = useToDo((state: ToDoState) => state.reorderColumns)
 
   useEffect(() => {
     inputRef.current?.focus()
