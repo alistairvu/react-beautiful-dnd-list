@@ -31,16 +31,6 @@ const useToDo = create<ToDoState>(
 
         reorderItems: (result: any) => {
           const { destination, source, draggableId } = result
-          if (!destination) {
-            return
-          }
-
-          if (
-            destination.droppableId === source.droppableId &&
-            destination.index === source.index
-          ) {
-            return
-          }
 
           const sourceColumn = get().columns[source.droppableId]
           const destinationColumn = get().columns[destination.droppableId]
@@ -66,24 +56,11 @@ const useToDo = create<ToDoState>(
         },
 
         reorderColumns: (result: any) => {
-          console.log("reordering...")
           const { destination, source, draggableId } = result
-
-          if (!destination) {
-            return
-          }
-
-          if (
-            destination.droppableId === source.droppableId &&
-            destination.index === source.index
-          ) {
-            return
-          }
 
           const newColumnOrder = [...get().columnOrder]
           newColumnOrder.splice(source.index, 1)
           newColumnOrder.splice(destination.index, 0, draggableId)
-          console.log({ newColumnOrder })
 
           set({
             columnOrder: newColumnOrder,

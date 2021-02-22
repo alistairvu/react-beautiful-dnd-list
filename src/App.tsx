@@ -64,13 +64,24 @@ const App = () => {
   }
 
   const onDragEnd = (result: any) => {
+    const { destination, source } = result
+    if (!destination) {
+      return
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return
+    }
+
     switch (result.type) {
       case "TASK": {
         reorderItems(result)
         break
       }
       case "COLUMN": {
-        console.log("changing columns")
         reorderColumns(result)
         break
       }
